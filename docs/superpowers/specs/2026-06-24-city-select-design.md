@@ -12,8 +12,11 @@
 - 微信小程序等小程序平台
 - Android App 容器
 - iOS App 容器
+- Flutter App
 
-第一版采用一套跨端代码覆盖多端，技术路线为 Core-first + Taro adapter。核心能力不绑定 React、Taro、DOM 或小程序 API，UI 适配层先实现 Taro，后续可以补 uni-app adapter。
+第一版采用一套跨端代码覆盖 H5、小程序和 App 容器，技术路线为 Core-first + Taro adapter。核心能力不绑定 React、Taro、DOM 或小程序 API，UI 适配层先实现 Taro，后续补 Flutter adapter 和 uni-app adapter。
+
+Flutter 作为计划支持平台处理：复用同一份数据规范、索引产物、provider 语义和中文 API 设计，但以 Dart/Flutter package 的形式实现 UI 与平台适配，避免把 TypeScript 运行时强行塞进 Flutter。
 
 ## 参考项目吸收点
 
@@ -52,6 +55,7 @@
 第一版不做：
 
 - 真实海外酒店 API 接入。
+- Flutter Widget package。
 - Android Kotlin/Compose 原生 SDK。
 - iOS SwiftUI 原生 SDK。
 - 全平台原生发布流程自动化。
@@ -63,7 +67,9 @@ packages/core
 packages/data
 packages/providers
 packages/taro
+packages/flutter_city_select
 apps/demo-taro
+apps/demo-flutter
 scripts
 docs
 ```
@@ -74,7 +80,9 @@ docs
 - `packages/data`：内置国内省/市/区基础数据，输出 city 和 region 两种数据格式。
 - `packages/providers`：目的地 provider 协议、mock provider、本地城市 provider、组合 provider。
 - `packages/taro`：Taro + React UI adapter，提供城市选择器、省市区选择器、目的地搜索组件。
+- `packages/flutter_city_select`：计划中的 Flutter adapter，提供 Dart 模型、Flutter Widget、provider 桥接和主题映射。
 - `apps/demo-taro`：展示 H5、小程序、Android、iOS 共用体验。
+- `apps/demo-flutter`：计划中的 Flutter 示例应用，展示 Android/iOS Flutter 体验。
 - `scripts`：数据更新、数据校验、索引生成、包体报告。
 - `docs`：中文优先文档、API、provider、数据说明和设计记录。
 
@@ -82,6 +90,7 @@ docs
 
 - `core` 不依赖任何 UI 框架。
 - `taro` 只处理界面、手势、动画、安全区和平台差异。
+- `flutter_city_select` 不复刻业务规则，优先消费 `data` 生成的 JSON/Dart 产物，并保持与 `core` 一致的搜索语义。
 - provider 接口与 UI 解耦。
 - 国内城市默认离线可用。
 - 海外/酒店搜索通过 provider 扩展。
@@ -203,6 +212,7 @@ mock 示例应使用中文展示，例如：
 - TypeScript 导出中文类型名和英文类型别名。
 - 运行时对象优先包含中文字段。
 - 英文字段可以通过 mapper 或兼容 getter 提供。
+- Flutter adapter 同样提供中文优先文档、中文语义配置和 Dart 类型别名；若具体 Dart 发布工具链对中文标识符存在限制，则保留英文稳定导出，并提供中文 helper、中文注释和中文示例作为一等入口。
 
 ## Provider 设计
 
@@ -251,6 +261,7 @@ type 目的地Provider = {
 - 搜索索引：名称、拼音、首字母、别名。
 - A-Z 分组索引。
 - 数据版本，例如 `2026.06-cn-region`。
+- Flutter/Dart 产物：生成 Dart model、常量索引或压缩 JSON asset，供 Flutter adapter 使用。
 
 数据校验：
 
@@ -369,6 +380,14 @@ type CitySelectTheme = {
 - 选择事件。
 - 空态和错误态。
 
+`flutter_city_select`：
+
+- Dart 模型和 JSON asset 读取。
+- 中文语义配置和英文兼容 API。
+- 城市选择、区域选择、目的地搜索 Widget 状态。
+- provider 桥接、错误态和空态。
+- Android/iOS 安全区、键盘和滚动行为。
+
 `demo`：
 
 - H5 构建。
@@ -376,6 +395,7 @@ type CitySelectTheme = {
 - 搜索态截图。
 - 空态截图。
 - 后续补小程序和 App 构建验证。
+- Flutter 阶段补 Android/iOS demo 构建验证。
 
 ## 发布策略
 
@@ -396,6 +416,8 @@ type CitySelectTheme = {
 
 第三阶段：
 
+- 补 Flutter adapter：
+  - `city_select_flutter`
 - 补 uni-app adapter：
   - `@ikalt/city-select-uni`
 
@@ -406,6 +428,7 @@ type CitySelectTheme = {
 - `docs/api.zh-CN.md`：中文 API。
 - `docs/provider.md`：目的地 provider 接入。
 - `docs/data.md`：数据来源、更新脚本、版本策略。
+- `docs/flutter.md`：Flutter adapter 使用方式、中文 API、主题映射和 provider 接入。
 
 ## 质量门禁
 
@@ -427,10 +450,12 @@ type CitySelectTheme = {
 5. 实现 `packages/taro` 中文优先组件 API。
 6. 实现 `apps/demo-taro`。
 7. 补中文文档、截图和发布说明。
+8. 后续实现 `packages/flutter_city_select` 和 `apps/demo-flutter`。
 
 ## 未纳入第一版的后续方向
 
 - 接入真实酒店/海外目的地 provider。
+- Flutter adapter。
 - uni-app adapter。
 - React Native adapter。
 - Android Kotlin/Compose 原生 SDK。
