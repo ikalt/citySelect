@@ -171,3 +171,36 @@ Created a pnpm workspace foundation with TypeScript, ESLint, Prettier, Vitest, f
 ### Next Steps
 
 - None - task complete
+
+
+## Session 6: 实现 CitySelect Taro 适配状态层
+
+**Date**: 2026-07-03
+**Task**: 实现 CitySelect Taro 适配状态层
+**Branch**: `codex/cityselect-mvp`
+
+### Summary
+
+完成 MVP Taro adapter 子任务：新增中文/英文 props 归一化、城市/省市区状态、结构化选择事件、目的地 provider 状态映射，并记录 adapter 契约。
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `aac41c7` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete

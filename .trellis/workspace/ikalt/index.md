@@ -8,7 +8,7 @@
 
 <!-- @@@auto:current-status -->
 - **Active File**: `journal-1.md`
-- **Total Sessions**: 5
+- **Total Sessions**: 6
 - **Last Active**: 2026-07-03
 <!-- @@@/auto:current-status -->
 
@@ -19,7 +19,7 @@
 <!-- @@@auto:active-documents -->
 | File | Lines | Status |
 |------|-------|--------|
-| `journal-1.md` | ~173 | Active |
+| `journal-1.md` | ~206 | Active |
 <!-- @@@/auto:active-documents -->
 
 ---
@@ -29,6 +29,7 @@
 <!-- @@@auto:session-history -->
 | # | Date | Title | Commits | Branch |
 |---|------|-------|---------|--------|
+| 6 | 2026-07-03 | 实现 CitySelect Taro 适配状态层 | `aac41c7` | `codex/cityselect-mvp` |
 | 5 | 2026-07-03 | 实现 CitySelect providers | `22cf930` | `codex/cityselect-mvp` |
 | 4 | 2026-07-03 | 实现 CitySelect 内置数据与校验 | `25c7992` | `codex/cityselect-mvp` |
 | 3 | 2026-07-03 | 实现 CitySelect core 搜索引擎 | `b7dab7a` | `codex/cityselect-mvp` |
