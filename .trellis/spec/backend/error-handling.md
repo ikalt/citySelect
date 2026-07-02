@@ -47,6 +47,116 @@ Use explicit result states at the provider/UI boundary:
 - timeout,
 - empty.
 
+## Scenario: Provider Search Response Contract
+
+### 1. Scope / Trigger
+
+- Trigger: `packages/providers` exposes local, mock, and composed destination
+  providers that must degrade gracefully without leaking raw exceptions to UI
+  adapters.
+- Applies when changing provider status values, composed-provider error
+  handling, source timeouts, or provider result shape.
+
+### 2. Signatures
+
+```ts
+type Provider状态 = "成功" | "空" | "部分失败" | "全部失败" | "超时"
+
+type Provider源错误 = {
+  来源: string
+  类型: "失败" | "超时"
+  消息: string
+}
+
+type ProviderSearchResponse = {
+  状态: Provider状态
+  结果: 目的地[]
+  错误列表: Provider源错误[]
+}
+
+type 目的地Provider = {
+  名称: string
+  搜索(关键词: string): Promise<ProviderSearchResponse>
+  获取热门?(): Promise<ProviderSearchResponse>
+  获取定位城市?(): Promise<城市 | null>
+}
+
+function 创建本地城市Provider(选项?: 本地城市Provider选项): 目的地Provider
+function 创建模拟目的地Provider(目的地列表?: readonly 目的地[]): 目的地Provider
+function 创建组合Provider(选项: {
+  providers: readonly 目的地Provider[]
+  名称?: string
+  超时时间毫秒?: number
+}): 目的地Provider
+```
+
+English aliases mirror the Chinese helper names:
+
+```ts
+const createLocalCityProvider: typeof 创建本地城市Provider
+const createMockDestinationProvider: typeof 创建模拟目的地Provider
+const createComposedProvider: typeof 创建组合Provider
+```
+
+### 3. Contracts
+
+- Providers return structured responses, not bare destination arrays.
+- Local city provider uses `packages/core` search over `packages/data` records.
+- Mock destination provider is deterministic and never calls real remote
+  services.
+- Composed provider catches source throws and timeouts, preserves successful
+  source results, and reports source errors in `错误列表`.
+- Local strong matches stay before mock / remote-like provider results.
+
+### 4. Validation & Error Matrix
+
+- Successful provider with results -> `状态: "成功"`.
+- Successful provider with no results -> `状态: "空"`.
+- At least one provider succeeds and at least one fails / times out ->
+  `状态: "部分失败"`.
+- Every provider throws -> `状态: "全部失败"`.
+- Every provider times out -> `状态: "超时"`.
+- Timeout error message must include provider name and timeout milliseconds.
+
+### 5. Good/Base/Bad Cases
+
+- Good: composed search returns local city results even when a remote-like
+  provider fails.
+- Base: single local provider returns `空` for unmatched domestic city keywords.
+- Bad: composed search throws because one optional provider failed.
+
+### 6. Tests Required
+
+- Local provider searches bundled domestic city data.
+- Mock provider returns hotel / airport / landmark examples.
+- Empty searches produce `空`.
+- Composed provider keeps local city matches before remote-like results.
+- Partial failure preserves successful results and records source failure.
+- All-failed and all-timeout cases return distinct statuses.
+
+### 7. Wrong vs Correct
+
+#### Wrong
+
+```ts
+const remoteResults = await remoteProvider.搜索(关键词)
+return localResults.concat(remoteResults)
+```
+
+This throws away local usability when the remote provider fails.
+
+#### Correct
+
+```ts
+const 响应 = await 组合Provider.搜索(关键词)
+if (响应.状态 === "部分失败") {
+  renderResultsWithDegradedNotice(响应.结果)
+}
+```
+
+The provider boundary communicates degradation explicitly while preserving
+usable results.
+
 ---
 
 ## Script Errors
