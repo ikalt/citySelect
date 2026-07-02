@@ -138,3 +138,36 @@ Created a pnpm workspace foundation with TypeScript, ESLint, Prettier, Vitest, f
 ### Next Steps
 
 - None - task complete
+
+
+## Session 5: 实现 CitySelect providers
+
+**Date**: 2026-07-03
+**Task**: 实现 CitySelect providers
+**Branch**: `codex/cityselect-mvp`
+
+### Summary
+
+完成 MVP providers 子任务：新增本地城市 provider、模拟目的地 provider、组合 provider、超时/失败/部分失败/空状态降级响应，并记录 provider 响应契约。
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `22cf930` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
