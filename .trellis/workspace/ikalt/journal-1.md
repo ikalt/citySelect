@@ -72,3 +72,36 @@ Created a pnpm workspace foundation with TypeScript, ESLint, Prettier, Vitest, f
 ### Next Steps
 
 - None - task complete
+
+
+## Session 3: 实现 CitySelect core 搜索引擎
+
+**Date**: 2026-07-03
+**Task**: 实现 CitySelect core 搜索引擎
+**Branch**: `codex/cityselect-mvp`
+
+### Summary
+
+完成 MVP 父任务拆分与 core 子任务：新增中文优先城市/目的地/区域类型、城市搜索索引、搜索排序、A-Z 分组、最近访问、区域路径结果，并记录 core API 契约。
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `b7dab7a` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
