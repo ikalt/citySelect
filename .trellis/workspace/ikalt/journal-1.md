@@ -204,3 +204,36 @@ Created a pnpm workspace foundation with TypeScript, ESLint, Prettier, Vitest, f
 ### Next Steps
 
 - None - task complete
+
+
+## Session 7: 实现 CitySelect demo 与中文文档
+
+**Date**: 2026-07-03
+**Task**: 实现 CitySelect demo 与中文文档
+**Branch**: `codex/cityselect-mvp`
+
+### Summary
+
+完成 MVP demo/docs 子任务：新增 demo:taro 命令、确定性 demo 快照、城市/省市区/目的地/空态/降级态测试，以及 README、API、provider、data、design 中文文档。
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `923c0f9` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
