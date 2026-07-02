@@ -237,3 +237,36 @@ Created a pnpm workspace foundation with TypeScript, ESLint, Prettier, Vitest, f
 ### Next Steps
 
 - None - task complete
+
+
+## Session 8: 完成 CitySelect MVP 集成验收
+
+**Date**: 2026-07-03
+**Task**: 完成 CitySelect MVP 集成验收
+**Branch**: `codex/cityselect-mvp`
+
+### Summary
+
+完成 CitySelect MVP 最终验收：补充 integration evidence，确认 lint/typecheck/format/test/data validation/demo 全部通过，归档 integration 子任务和 MVP 父任务。
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `4df478d` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
