@@ -8,7 +8,7 @@
 
 <!-- @@@auto:current-status -->
 - **Active File**: `journal-1.md`
-- **Total Sessions**: 8
+- **Total Sessions**: 9
 - **Last Active**: 2026-07-03
 <!-- @@@/auto:current-status -->
 
@@ -19,7 +19,7 @@
 <!-- @@@auto:active-documents -->
 | File | Lines | Status |
 |------|-------|--------|
-| `journal-1.md` | ~272 | Active |
+| `journal-1.md` | ~305 | Active |
 <!-- @@@/auto:active-documents -->
 
 ---
@@ -29,6 +29,7 @@
 <!-- @@@auto:session-history -->
 | # | Date | Title | Commits | Branch |
 |---|------|-------|---------|--------|
+| 9 | 2026-07-03 | 升级全国完整行政区划数据 | `4a2eff4` | `codex/cityselect-mvp` |
 | 8 | 2026-07-03 | 完成 CitySelect MVP 集成验收 | `4df478d` | `codex/cityselect-mvp` |
 | 7 | 2026-07-03 | 实现 CitySelect demo 与中文文档 | `923c0f9` | `codex/cityselect-mvp` |
 | 6 | 2026-07-03 | 实现 CitySelect Taro 适配状态层 | `aac41c7` | `codex/cityselect-mvp` |
