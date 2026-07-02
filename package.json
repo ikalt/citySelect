@@ -6,6 +6,7 @@
     "lint": "eslint .",
     "typecheck": "tsc -b",
     "test": "vitest run",
+    "validate:data": "tsc -b && node packages/data/dist/validate-data.js",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
   },

@@ -59,6 +59,9 @@ npm exec --yes --package pnpm@9.15.4 -- pnpm test
 - Formatting ignores Trellis/Codex generated or managed files:
   `.agents/`, `.codex/`, `.trellis/`, `AGENTS.md`, `tmp/`, generated build
   directories, and dependency folders.
+- ESLint ignores package-level generated output recursively with `**/dist/**`
+  and `**/build/**`; root-only `dist/**` is not enough after package commands
+  emit `packages/*/dist`.
 
 ### 4. Validation & Error Matrix
 

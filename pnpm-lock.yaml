@@ -34,7 +34,11 @@ importers:
 
   packages/core: {}
 
-  packages/data: {}
+  packages/data:
+    dependencies:
+      '@ikalt/city-select-core':
+        specifier: workspace:*
+        version: link:../core
 
   packages/providers: {}
 
