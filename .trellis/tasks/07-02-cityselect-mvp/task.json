@@ -1,0 +1,33 @@
+{
+  "id": "cityselect-mvp",
+  "name": "cityselect-mvp",
+  "title": "完成 CitySelect 第一版 MVP",
+  "description": "",
+  "status": "planning",
+  "dev_type": null,
+  "scope": "full-project-mvp",
+  "package": null,
+  "priority": "P2",
+  "creator": "ikalt",
+  "assignee": "ikalt",
+  "createdAt": "2026-07-02",
+  "completedAt": null,
+  "branch": "codex/cityselect-mvp",
+  "base_branch": "codex/workspace-tooling",
+  "worktree_path": null,
+  "commit": null,
+  "pr_url": null,
+  "subtasks": [],
+  "children": [
+    "07-02-cityselect-core-engine",
+    "07-02-cityselect-data-validation",
+    "07-02-cityselect-providers",
+    "07-02-cityselect-taro-adapter",
+    "07-02-cityselect-demo-docs",
+    "07-02-cityselect-mvp-integration"
+  ],
+  "parent": null,
+  "relatedFiles": [],
+  "notes": "",
+  "meta": {}
+}
