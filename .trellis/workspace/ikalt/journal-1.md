@@ -105,3 +105,36 @@ Created a pnpm workspace foundation with TypeScript, ESLint, Prettier, Vitest, f
 ### Next Steps
 
 - None - task complete
+
+
+## Session 4: 实现 CitySelect 内置数据与校验
+
+**Date**: 2026-07-03
+**Task**: 实现 CitySelect 内置数据与校验
+**Branch**: `codex/cityselect-mvp`
+
+### Summary
+
+完成 MVP data 子任务：新增版本化内置城市与行政区数据、热门城市编码、结构化数据校验、validate:data 命令，并修正包内 dist 生成产物的 ESLint 忽略规则。
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `25c7992` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
