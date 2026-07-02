@@ -11,6 +11,7 @@
     "composite": true,
     "isolatedModules": true,
     "skipLibCheck": true,
+    "types": ["node"],
     "noEmitOnError": true,
     "forceConsistentCasingInFileNames": true
   }

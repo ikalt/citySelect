@@ -49,7 +49,17 @@ importers:
         specifier: workspace:*
         version: link:../data
 
-  packages/taro: {}
+  packages/taro:
+    dependencies:
+      '@ikalt/city-select-core':
+        specifier: workspace:*
+        version: link:../core
+      '@ikalt/city-select-data':
+        specifier: workspace:*
+        version: link:../data
+      '@ikalt/city-select-providers':
+        specifier: workspace:*
+        version: link:../providers
 
 packages:
 

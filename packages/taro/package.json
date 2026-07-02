@@ -5,5 +5,10 @@
   "private": true,
   "exports": {
     ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@ikalt/city-select-core": "workspace:*",
+    "@ikalt/city-select-data": "workspace:*",
+    "@ikalt/city-select-providers": "workspace:*"
   }
 }

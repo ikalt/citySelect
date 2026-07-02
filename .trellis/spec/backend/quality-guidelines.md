@@ -62,6 +62,10 @@ npm exec --yes --package pnpm@9.15.4 -- pnpm test
 - ESLint ignores package-level generated output recursively with `**/dist/**`
   and `**/build/**`; root-only `dist/**` is not enough after package commands
   emit `packages/*/dist`.
+- `tsconfig.base.json` includes Node types because workspace package exports
+  point at source files. Downstream package builds can type-check imported
+  provider/data CLI source under the consumer package context, so package-local
+  `types` alone is not enough.
 
 ### 4. Validation & Error Matrix
 
