@@ -7,6 +7,7 @@
     "typecheck": "tsc -b",
     "test": "vitest run",
     "validate:data": "tsc -b && node packages/data/dist/validate-data.js",
+    "demo:taro": "tsc -b && TMPDIR=/tmp tsx apps/demo-taro/src/run-demo.ts",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
   },
@@ -15,6 +16,7 @@
     "@types/node": "latest",
     "eslint": "latest",
     "prettier": "latest",
+    "tsx": "latest",
     "typescript": "latest",
     "typescript-eslint": "latest",
     "vitest": "latest"
