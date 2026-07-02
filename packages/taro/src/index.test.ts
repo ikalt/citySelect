@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest"
 
 import { 创建模拟目的地Provider, 创建组合Provider } from "@ikalt/city-select-providers"
+import { 按编码查找行政区, 按父级编码查找行政区 } from "@ikalt/city-select-data"
 
 import {
   CitySelect,
@@ -69,6 +70,28 @@ describe("@ikalt/city-select-taro", () => {
     触发行政区选择(状态)
 
     expect(选择列表).toEqual(["浙江省/杭州市/西湖区"])
+  })
+
+  it("supports four-level and Hong Kong/Macau/Taiwan variable-depth region paths", () => {
+    const 四级状态 = 创建省市区选择器状态({
+      编码路径: ["330000", "330100", "330106", "330106002"],
+    })
+    const 台湾 = 按编码查找行政区("710000")!
+    const 台北 = 按父级编码查找行政区(台湾.编码).find((记录) => 记录.名称 === "台北市")!
+    const 大安 = 按父级编码查找行政区(台北.编码).find((记录) => 记录.名称 === "大安区")!
+    const 港澳台状态 = 创建省市区选择器状态({
+      编码路径: [台湾.编码, 台北.编码, 大安.编码],
+    })
+
+    expect(四级状态.选择结果?.名称路径).toEqual([
+      "浙江省",
+      "杭州市",
+      "西湖区",
+      "北山街道",
+    ])
+    expect(四级状态.选择结果?.乡镇街道?.名称).toBe("北山街道")
+    expect(港澳台状态.选择结果?.名称路径).toEqual(["台湾省", "台北市", "大安区"])
+    expect(港澳台状态.选择结果?.编码路径).toHaveLength(3)
   })
 
   it("maps provider statuses into distinct destination search UI states", async () => {

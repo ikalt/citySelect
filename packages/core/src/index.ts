@@ -1,7 +1,10 @@
 export const citySelectCorePackage = "@ikalt/city-select-core" as const
 
-export type 行政级别 = "省" | "市" | "区县"
+export type 行政级别 = "省" | "市" | "区县" | "乡镇街道"
 export type AdministrativeLevel = 行政级别
+
+export type 地区口径 = "大陆行政区划" | "香港澳门特别行政区" | "台湾地区"
+export type RegionScope = 地区口径
 
 export type 城市 = {
   编码: string
@@ -12,6 +15,10 @@ export type 城市 = {
   首字母?: string
   别名?: readonly string[]
   级别: 行政级别
+  行政区类型?: string
+  地区口径?: 地区口径
+  路径编码?: readonly string[]
+  路径名称?: readonly string[]
   国家代码?: "CN" | string
   热门?: boolean
   经度?: number
@@ -37,9 +44,11 @@ export type Destination = 目的地
 export type 行政区选择结果 = {
   编码路径: string[]
   名称路径: string[]
+  完整路径: 城市[]
   省?: 城市
   市?: 城市
   区县?: 城市
+  乡镇街道?: 城市
 }
 export type RegionSelectionResult = 行政区选择结果
 
@@ -159,16 +168,18 @@ export function 更新最近访问城市(
 export const updateRecentCities = 更新最近访问城市
 
 export function 创建行政区选择结果(路径: readonly 城市[]): 行政区选择结果 {
-  if (路径.length === 0 || 路径.length > 3) {
-    throw new RangeError("行政区选择路径必须包含 1 到 3 个层级")
+  if (路径.length === 0 || 路径.length > 4) {
+    throw new RangeError("行政区选择路径必须包含 1 到 4 个层级")
   }
 
   return {
     编码路径: 路径.map((城市) => 城市.编码),
     名称路径: 路径.map((城市) => 城市.名称),
-    省: 路径[0],
-    市: 路径[1],
-    区县: 路径[2],
+    完整路径: [...路径],
+    省: 查找层级(路径, "省"),
+    市: 查找层级(路径, "市"),
+    区县: 查找层级(路径, "区县"),
+    乡镇街道: 查找层级(路径, "乡镇街道"),
   }
 }
 
@@ -176,6 +187,10 @@ export const createRegionSelectionResult = 创建行政区选择结果
 
 function 是城市搜索索引(值: 城市搜索索引 | readonly 城市[]): 值 is 城市搜索索引 {
   return "条目列表" in 值
+}
+
+function 查找层级(路径: readonly 城市[], 级别: 行政级别): 城市 | undefined {
+  return 路径.find((城市) => 城市.级别 === 级别)
 }
 
 function 计算城市搜索结果(

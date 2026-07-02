@@ -5,6 +5,9 @@
 AGENTS.md
 build/
 dist/
+**/dist/**
 node_modules/
+packages/data/source/
+packages/data/src/generated/
 tmp/
 pnpm-lock.yaml

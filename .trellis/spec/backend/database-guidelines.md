@@ -35,7 +35,8 @@ Generate these artifacts from source data:
 
 - city data: province/city records with code, name, pinyin, initials, and hot
   city markers.
-- region data: province/city/district hierarchy.
+- region data: mainland province/city/county/township hierarchy, plus
+  Hong Kong / Macau / Taiwan variable-depth paths.
 - search index: name, pinyin, initials, and aliases.
 - A-Z group index.
 - data version metadata such as `2026.06-cn-region`.
@@ -55,18 +56,27 @@ Every data generation or update path must validate:
 - names are non-empty,
 - levels are legal,
 - parent-child relationships are complete,
+- generated path codes and names are complete,
+- mainland administrative code shape is valid for its level,
 - pinyin and initials exist,
 - hot cities resolve to formal city records,
 - generated artifacts can be read by `packages/core`.
+
+Full-region generation must preserve source attribution: source name, source
+URL, source type, package version or commit, license notes, data cutoff date,
+generation timestamp, generation script version, validation basis, and count
+summary. Third-party seeds must be labelled as third-party seeds even when
+their upstream data references official public datasets.
 
 ## Scenario: Built-In Data Validation Contract
 
 ### 1. Scope / Trigger
 
-- Trigger: `packages/data` exports bundled MVP city / region data and a
+- Trigger: `packages/data` exports bundled national city / region data and a
   validation command used by tests, providers, demos, and release checks.
 - Applies when changing bundled records, hot-city defaults, validation issue
-  shape, or the `validate:data` command.
+  shape, source metadata, generated artifacts, query helpers, or the
+  `validate:data` command.
 
 ### 2. Signatures
 
@@ -74,6 +84,25 @@ Every data generation or update path must validate:
 type 数据版本信息 = {
   编码: string
   名称: string
+}
+
+type 数据来源信息 = {
+  来源名称: string
+  来源URL: string
+  来源类型: "官方源" | "第三方种子"
+  许可证?: string
+  版本或Commit?: string
+  数据截止日期: string
+  抓取时间: string
+  生成脚本版本: string
+  校验依据: readonly string[]
+  记录数量: {
+    省级: number
+    地级: number
+    县级: number
+    乡级: number
+    港澳台: number
+  }
 }
 
 type 数据校验问题 = {
@@ -84,6 +113,11 @@ type 数据校验问题 = {
     | "缺少拼音"
     | "缺少首字母"
     | "父级缺失"
+    | "层级关系非法"
+    | "路径缺失"
+    | "路径不一致"
+    | "大陆编码非法"
+    | "乡级编码非法"
     | "热门城市缺失"
   编码?: string
   消息: string
@@ -96,10 +130,15 @@ type 城市数据校验输入 = {
 }
 
 const 数据版本: 数据版本信息
+const 数据来源: 数据来源信息
 const 内置城市列表: readonly 城市[]
 const 内置行政区列表: readonly 城市[]
 const 热门城市编码: readonly string[]
 
+function 按编码查找行政区(编码: string): 城市 | undefined
+function 按父级编码查找行政区(父级编码?: string): 城市[]
+function 按级别查找行政区(级别: 行政级别): 城市[]
+function 获取行政区路径(编码: string): 城市[]
 function 校验城市数据(输入: 城市数据校验输入): 数据校验问题[]
 function 校验内置数据(): 数据校验问题[]
 ```
@@ -108,9 +147,14 @@ English aliases mirror the Chinese exports:
 
 ```ts
 const dataVersion: typeof 数据版本
+const dataSource: typeof 数据来源
 const builtInCities: typeof 内置城市列表
 const builtInRegions: typeof 内置行政区列表
 const hotCityCodes: typeof 热门城市编码
+const findRegionByCode: typeof 按编码查找行政区
+const findRegionsByParentCode: typeof 按父级编码查找行政区
+const findRegionsByLevel: typeof 按级别查找行政区
+const getRegionPath: typeof 获取行政区路径
 const validateCityData: typeof 校验城市数据
 const validateBuiltInData: typeof 校验内置数据
 ```
@@ -125,29 +169,43 @@ npm exec --yes --package pnpm@9.15.4 -- pnpm validate:data
 
 - `packages/data` may depend on `@ikalt/city-select-core` public types.
 - `packages/core` must not depend on `packages/data`.
+- Full data must be generated from committed source snapshots and a deterministic
+  script, not hand-maintained as large arrays in `packages/data/src/index.ts`.
 - Validation returns structured issues and does not throw for ordinary bad
   records.
 - `validate:data` compiles TypeScript first, then runs the emitted Node CLI from
   `packages/data/dist/validate-data.js`.
-- CLI success prints version and record counts, then exits 0.
+- CLI success prints version, record counts, level counts, source name/source
+  type/data cutoff, then exits 0.
 - CLI failure prints each structured issue and exits non-zero.
+- Hong Kong / Macau / Taiwan records may use variable-depth paths and generated
+  stable prefixed codes, but must not collide with mainland numeric codes.
+- Village / community / neighborhood committee data is out of scope for the
+  first full dataset.
 
 ### 4. Validation & Error Matrix
 
 - Duplicate code inside `城市列表` or inside `行政区列表` -> `重复编码`.
 - Empty `名称` -> `名称为空`.
-- `级别` outside `省 | 市 | 区县` -> `级别非法`.
+- `级别` outside `省 | 市 | 区县 | 乡镇街道` -> `级别非法`.
 - Missing `拼音` -> `缺少拼音`.
 - Missing `首字母` -> `缺少首字母`.
 - Non-province administrative record with missing / unknown `父级编码` ->
   `父级缺失`.
+- Illegal mainland parent-child level transition -> `层级关系非法`.
+- Missing `路径编码` / `路径名称` -> `路径缺失`.
+- Broken path terminal record or missing path code -> `路径不一致`.
+- Mainland province/city/county six-digit code shape mismatch ->
+  `大陆编码非法`.
+- Mainland township/street nine-digit code shape mismatch or invalid prefix ->
+  `乡级编码非法`.
 - Hot-city code not present in `城市列表` -> `热门城市缺失`.
 
 ### 5. Good/Base/Bad Cases
 
 - Good: tests call `校验城市数据` with focused fixtures and the full gate runs
   `validate:data`.
-- Base: demos consume `内置城市列表`, `内置行政区列表`, and `热门城市编码` directly.
+- Base: demos consume public data exports and query helpers directly.
 - Bad: adding a new bundled record while only running `vitest` and skipping
   `validate:data`.
 
@@ -157,6 +215,8 @@ npm exec --yes --package pnpm@9.15.4 -- pnpm validate:data
 - Bundled data passes `校验内置数据`.
 - Duplicate city codes produce `重复编码` with the duplicated code.
 - Missing administrative parent links produce `父级缺失` with the child code.
+- Broken path records produce `路径缺失` or `路径不一致`.
+- Mainland township/street code shape issues produce `乡级编码非法`.
 - Missing hot-city references produce `热门城市缺失`.
 - `validate:data` exits 0 for the committed bundled dataset.
 
@@ -194,7 +254,11 @@ type 城市 = {
   省份名称?: string
   拼音?: string
   首字母?: string
-  级别: "省" | "市" | "区县"
+  级别: "省" | "市" | "区县" | "乡镇街道"
+  行政区类型?: string
+  地区口径?: "大陆行政区划" | "香港澳门特别行政区" | "台湾地区"
+  路径编码?: readonly string[]
+  路径名称?: readonly string[]
   国家代码?: "CN"
 }
 ```
@@ -205,9 +269,11 @@ Region selections return paths instead of flattened strings:
 type 行政区选择结果 = {
   编码路径: string[]
   名称路径: string[]
+  完整路径: 城市[]
   省?: 城市
   市?: 城市
   区县?: 城市
+  乡镇街道?: 城市
 }
 ```
 

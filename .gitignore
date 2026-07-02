@@ -1,6 +1,8 @@
 tmp/
 node_modules/
 dist/
+!packages/data/source/china-division-2.7.0/dist/
+!packages/data/source/china-division-2.7.0/dist/*.json
 build/
 .turbo/
 .pnpm-store/
