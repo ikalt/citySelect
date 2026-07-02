@@ -1,0 +1,10 @@
+{
+  "files": [],
+  "references": [
+    { "path": "./packages/core" },
+    { "path": "./packages/data" },
+    { "path": "./packages/providers" },
+    { "path": "./packages/taro" },
+    { "path": "./apps/demo-taro" }
+  ]
+}

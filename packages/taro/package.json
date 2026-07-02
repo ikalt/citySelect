@@ -1,0 +1,9 @@
+{
+  "name": "@ikalt/city-select-taro",
+  "version": "0.0.0",
+  "type": "module",
+  "private": true,
+  "exports": {
+    ".": "./src/index.ts"
+  }
+}

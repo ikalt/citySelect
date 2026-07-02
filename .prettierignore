@@ -1,0 +1,10 @@
+.agents/
+.codex/
+.trellis/
+.turbo/
+AGENTS.md
+build/
+dist/
+node_modules/
+tmp/
+pnpm-lock.yaml

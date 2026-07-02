@@ -6,3 +6,4 @@ build/
 .pnpm-store/
 .DS_Store
 *.log
+*.tsbuildinfo
