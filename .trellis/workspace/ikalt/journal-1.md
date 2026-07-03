@@ -303,3 +303,36 @@ Created a pnpm workspace foundation with TypeScript, ESLint, Prettier, Vitest, f
 ### Next Steps
 
 - None - task complete
+
+
+## Session 10: Add lazy region shards and release checks
+
+**Date**: 2026-07-04
+**Task**: Add lazy region shards and release checks
+**Branch**: `codex/cityselect-mvp`
+
+### Summary
+
+Split city and region generated data into lightweight city exports, full compatibility data, region manifest and province/HMT lazy shards; added lazy/prefetch APIs, size report, dist-only pack dry-run, release check, docs/spec updates, and demo/test coverage.
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `07a90f1` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete

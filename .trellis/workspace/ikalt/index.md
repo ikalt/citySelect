@@ -8,8 +8,8 @@
 
 <!-- @@@auto:current-status -->
 - **Active File**: `journal-1.md`
-- **Total Sessions**: 9
-- **Last Active**: 2026-07-03
+- **Total Sessions**: 10
+- **Last Active**: 2026-07-04
 <!-- @@@/auto:current-status -->
 
 ---
@@ -19,7 +19,7 @@
 <!-- @@@auto:active-documents -->
 | File | Lines | Status |
 |------|-------|--------|
-| `journal-1.md` | ~305 | Active |
+| `journal-1.md` | ~338 | Active |
 <!-- @@@/auto:active-documents -->
 
 ---
@@ -29,6 +29,7 @@
 <!-- @@@auto:session-history -->
 | # | Date | Title | Commits | Branch |
 |---|------|-------|---------|--------|
+| 10 | 2026-07-04 | Add lazy region shards and release checks | `07a90f1` | `codex/cityselect-mvp` |
 | 9 | 2026-07-03 | 升级全国完整行政区划数据 | `4a2eff4` | `codex/cityselect-mvp` |
 | 8 | 2026-07-03 | 完成 CitySelect MVP 集成验收 | `4df478d` | `codex/cityselect-mvp` |
 | 7 | 2026-07-03 | 实现 CitySelect demo 与中文文档 | `923c0f9` | `codex/cityselect-mvp` |
