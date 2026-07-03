@@ -171,6 +171,7 @@ async function main() {
     ...sourceInfo,
     记录数量: stats,
   }
+  source.层级来源 = createLevelSourceInfo(source, stats)
   const publicCityRecords = cityRecords.map(stripInternalPath)
   const publicRegionRecords = regionRecords.map(stripInternalPath)
   const shards = createRegionShards(publicRegionRecords)
@@ -454,6 +455,35 @@ function countStats(records) {
   }
 }
 
+function createLevelSourceInfo(source, stats) {
+  const notes = {
+    省级: "大陆省级行政区划",
+    地级: "大陆地级行政区划",
+    县级: "大陆县级行政区划",
+    乡级: "大陆乡镇街道级行政区划",
+    港澳台: "港澳台可变深度行政区划",
+  }
+
+  return Object.fromEntries(
+    Object.entries(stats)
+      .filter(([, count]) => count > 0)
+      .map(([level, count]) => [
+        level,
+        {
+          层级: level,
+          来源名称: source.来源名称,
+          来源URL: source.来源URL,
+          来源类型: source.来源类型,
+          许可证: source.许可证,
+          版本或Commit: source.版本或Commit,
+          数据截止日期: source.数据截止日期,
+          记录数量: count,
+          备注: notes[level] ?? level,
+        },
+      ]),
+  )
+}
+
 function compareRecord(left, right) {
   return left.编码.localeCompare(right.编码, "en")
 }
@@ -494,7 +524,7 @@ function createRegionManifest(regionRecords, shards, source) {
     .filter((record) => !record.父级编码)
     .sort(compareRecord)
   const shardInfos = [...shards.entries()].map(([shardKey, records]) =>
-    createShardInfo(shardKey, records),
+    createShardInfo(shardKey, records, source),
   )
 
   return {
@@ -505,14 +535,16 @@ function createRegionManifest(regionRecords, shards, source) {
   }
 }
 
-function createShardInfo(shardKey, records) {
+function createShardInfo(shardKey, records, source) {
   const rootRecords = records.filter((record) => !record.父级编码)
+  const stats = countStats(records)
   return {
     分片键: shardKey,
     名称: shardKey === "hmt" ? "港澳台" : (rootRecords[0]?.名称 ?? shardKey),
     根编码列表: rootRecords.map((record) => record.编码),
     记录数: records.length,
-    层级统计: countStats(records),
+    层级统计: stats,
+    层级来源: createLevelSourceInfo(source, stats),
     地区口径: shardKey === "hmt" ? undefined : rootRecords[0]?.地区口径,
     checksum: checksumRecords(records),
   }
@@ -530,7 +562,7 @@ function generatedHeader() {
 }
 
 function renderSharedTypes() {
-  return `export type 数据来源类型 = "官方源" | "第三方种子"\nexport type DataSourceType = 数据来源类型\n\nexport type 行政区层级统计 = {\n  省级: number\n  地级: number\n  县级: number\n  乡级: number\n  港澳台: number\n}\nexport type RegionLevelStats = 行政区层级统计\n\nexport type 数据来源信息 = {\n  来源名称: string\n  来源URL: string\n  来源类型: 数据来源类型\n  许可证?: string\n  版本或Commit?: string\n  数据截止日期: string\n  抓取时间: string\n  生成脚本版本: string\n  校验依据: readonly string[]\n  记录数量: 行政区层级统计\n}\nexport type DataSourceInfo = 数据来源信息\n`
+  return `export type 数据来源类型 = "官方源" | "第三方种子"\nexport type DataSourceType = 数据来源类型\n\nexport type 行政区层级统计 = {\n  省级: number\n  地级: number\n  县级: number\n  乡级: number\n  港澳台: number\n}\nexport type RegionLevelStats = 行政区层级统计\nexport type 行政区来源层级 = keyof 行政区层级统计\nexport type RegionSourceLevel = 行政区来源层级\n\nexport type 数据来源层级明细 = {\n  层级: 行政区来源层级\n  来源名称: string\n  来源URL: string\n  来源类型: 数据来源类型\n  许可证?: string\n  版本或Commit?: string\n  数据截止日期: string\n  记录数量: number\n  备注?: string\n}\nexport type DataSourceLevelDetail = 数据来源层级明细\nexport type 数据来源层级明细表 = Readonly<Partial<Record<行政区来源层级, 数据来源层级明细>>>\nexport type DataSourceLevelDetails = 数据来源层级明细表\n\nexport type 数据来源信息 = {\n  来源名称: string\n  来源URL: string\n  来源类型: 数据来源类型\n  许可证?: string\n  版本或Commit?: string\n  数据截止日期: string\n  抓取时间: string\n  生成脚本版本: string\n  校验依据: readonly string[]\n  记录数量: 行政区层级统计\n  层级来源: 数据来源层级明细表\n}\nexport type DataSourceInfo = 数据来源信息\n`
 }
 
 function renderCitiesFile(cityRecords, source) {
@@ -552,7 +584,7 @@ function renderLegacyRegionsFile() {
 }
 
 function renderManifestFile(manifest) {
-  return `${generatedHeader()}import type { 城市, 地区口径 } from "@ikalt/city-select-core"\nimport type { 数据来源信息, 行政区层级统计 } from "./cities.js"\n\nexport type 行政区分片信息 = {\n  分片键: string\n  名称: string\n  根编码列表: readonly string[]\n  记录数: number\n  层级统计: 行政区层级统计\n  地区口径?: 地区口径\n  checksum: string\n}\nexport type RegionShardInfo = 行政区分片信息\n\nexport const 生成行政区来源: 数据来源信息 = ${JSON.stringify(manifest.source, null, 2)}\nexport const generatedRegionSource = 生成行政区来源\n\nexport const 生成行政区分片列表: readonly 行政区分片信息[] = ${JSON.stringify(manifest.shardInfos, null, 2)}\nexport const generatedRegionShardInfos: readonly 行政区分片信息[] = 生成行政区分片列表\n\nexport const 生成行政区编码分片表: Readonly<Record<string, string>> = ${JSON.stringify(manifest.codeToShard, null, 2)}\nexport const generatedRegionCodeShardMap: Readonly<Record<string, string>> = 生成行政区编码分片表\n\nconst generatedRootRegionsJson = ${JSON.stringify(JSON.stringify(manifest.rootRecords))}\nexport const 生成行政区根列表 = JSON.parse(generatedRootRegionsJson) as readonly 城市[]\nexport const generatedRootRegions = 生成行政区根列表\n`
+  return `${generatedHeader()}import type { 城市, 地区口径 } from "@ikalt/city-select-core"\nimport type { 数据来源信息, 数据来源层级明细表, 行政区层级统计 } from "./cities.js"\n\nexport type 行政区分片信息 = {\n  分片键: string\n  名称: string\n  根编码列表: readonly string[]\n  记录数: number\n  层级统计: 行政区层级统计\n  层级来源: 数据来源层级明细表\n  地区口径?: 地区口径\n  checksum: string\n}\nexport type RegionShardInfo = 行政区分片信息\n\nexport const 生成行政区来源: 数据来源信息 = ${JSON.stringify(manifest.source, null, 2)}\nexport const generatedRegionSource = 生成行政区来源\n\nexport const 生成行政区分片列表: readonly 行政区分片信息[] = ${JSON.stringify(manifest.shardInfos, null, 2)}\nexport const generatedRegionShardInfos: readonly 行政区分片信息[] = 生成行政区分片列表\n\nexport const 生成行政区编码分片表: Readonly<Record<string, string>> = ${JSON.stringify(manifest.codeToShard, null, 2)}\nexport const generatedRegionCodeShardMap: Readonly<Record<string, string>> = 生成行政区编码分片表\n\nconst generatedRootRegionsJson = ${JSON.stringify(JSON.stringify(manifest.rootRecords))}\nexport const 生成行政区根列表 = JSON.parse(generatedRootRegionsJson) as readonly 城市[]\nexport const generatedRootRegions = 生成行政区根列表\n`
 }
 
 function renderShardLoaderFile(shards) {

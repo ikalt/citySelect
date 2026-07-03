@@ -33,7 +33,7 @@ npm exec --yes --package pnpm@9.15.4 -- pnpm demo:taro
 - 港澳台包含在全国库中，采用可变深度路径和地区专属 `行政区类型`。
 - 第一版不包含村 / 社区 / 居委会第五级。
 
-数据种子来自 `china-division@2.7.0`，作为第三方整理库使用。源快照记录在 `packages/data/source/china-division-2.7.0/`，生成产物记录来源 URL、许可证说明、数据截止日期 `2023-06-30` 和生成摘要。
+数据种子来自 `china-division@2.7.0`，作为第三方整理库使用。源快照记录在 `packages/data/source/china-division-2.7.0/`，生成产物记录来源 URL、许可证说明、数据截止日期 `2023-06-30`、层级来源和生成摘要。官方 / 更近第三方源已完成研究，当前因稳定批量入口和覆盖完整性不足暂不替换，详见 [数据与校验](docs/data.md)。
 
 ## 数据入口
 

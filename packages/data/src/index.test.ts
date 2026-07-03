@@ -53,6 +53,17 @@ describe("@ikalt/city-select-data", () => {
         港澳台: 411,
       },
     })
+    expect(数据来源.层级来源.乡级).toMatchObject({
+      层级: "乡级",
+      来源名称: "china-division",
+      数据截止日期: "2023-06-30",
+      记录数量: 41352,
+    })
+    expect(数据来源.层级来源.港澳台).toMatchObject({
+      层级: "港澳台",
+      来源名称: "china-division",
+      记录数量: 411,
+    })
     expect(城市列表.length).toBeGreaterThan(300)
     expect(行政区列表.length).toBeGreaterThan(45_000)
     expect(热门城市编码).toEqual(["110000", "310000", "440300", "330100"])
@@ -115,12 +126,22 @@ describe("@ikalt/city-select-data", () => {
       根编码列表: ["330000"],
       地区口径: "大陆行政区划",
     })
+    expect(浙江分片信息?.层级来源.乡级).toMatchObject({
+      来源名称: "china-division",
+      数据截止日期: "2023-06-30",
+    })
     expect(浙江分片信息?.记录数).toBeGreaterThan(1_000)
     expect(浙江分片信息?.checksum).toMatch(/^[0-9a-f]{16}$/)
     expect(港澳台分片信息).toMatchObject({
       分片键: "hmt",
       名称: "港澳台",
       根编码列表: ["710000", "810000", "820000"],
+    })
+    expect(港澳台分片信息?.层级来源).not.toHaveProperty("乡级")
+    expect(港澳台分片信息?.层级来源.港澳台).toMatchObject({
+      来源名称: "china-division",
+      数据截止日期: "2023-06-30",
+      记录数量: 411,
     })
     expect(浙江分片.some((记录) => 记录.编码 === "330106002")).toBe(true)
     expect(缺失分片).toEqual([])

@@ -38,7 +38,7 @@ Generate these artifacts from source data:
 - region data: mainland province/city/county/township hierarchy, plus
   Hong Kong / Macau / Taiwan variable-depth paths.
 - region manifest: shard key, root codes, counts, level stats, source summary,
-  checksum, code-to-shard index, and root region list.
+  per-level source details, checksum, code-to-shard index, and root region list.
 - region shards: mainland records split by province root code, plus a Hong Kong
   / Macau / Taiwan shard.
 - search index: name, pinyin, initials, and aliases.
@@ -71,6 +71,9 @@ URL, source type, package version or commit, license notes, data cutoff date,
 generation timestamp, generation script version, validation basis, and count
 summary. Third-party seeds must be labelled as third-party seeds even when
 their upstream data references official public datasets.
+Source attribution must include per-level details (`层级来源`) globally and per
+shard, so future mixed-source data can state which source owns province, city,
+county, township, and Hong Kong / Macau / Taiwan records.
 
 ## Scenario: Built-In Data Validation Contract
 
@@ -90,6 +93,32 @@ type 数据版本信息 = {
   名称: string
 }
 
+type 行政区层级统计 = {
+  省级: number
+  地级: number
+  县级: number
+  乡级: number
+  港澳台: number
+}
+
+type 行政区来源层级 = keyof 行政区层级统计
+
+type 数据来源层级明细 = {
+  层级: 行政区来源层级
+  来源名称: string
+  来源URL: string
+  来源类型: "官方源" | "第三方种子"
+  许可证?: string
+  版本或Commit?: string
+  数据截止日期: string
+  记录数量: number
+  备注?: string
+}
+
+type 数据来源层级明细表 = Readonly<
+  Partial<Record<行政区来源层级, 数据来源层级明细>>
+>
+
 type 数据来源信息 = {
   来源名称: string
   来源URL: string
@@ -100,13 +129,8 @@ type 数据来源信息 = {
   抓取时间: string
   生成脚本版本: string
   校验依据: readonly string[]
-  记录数量: {
-    省级: number
-    地级: number
-    县级: number
-    乡级: number
-    港澳台: number
-  }
+  记录数量: 行政区层级统计
+  层级来源: 数据来源层级明细表
 }
 
 type 数据校验问题 = {
@@ -145,6 +169,7 @@ type 行政区分片信息 = {
   根编码列表: readonly string[]
   记录数: number
   层级统计: 行政区层级统计
+  层级来源: 数据来源层级明细表
   地区口径?: 地区口径
   checksum: string
 }

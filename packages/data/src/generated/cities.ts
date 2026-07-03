@@ -15,6 +15,23 @@ export type 行政区层级统计 = {
   港澳台: number
 }
 export type RegionLevelStats = 行政区层级统计
+export type 行政区来源层级 = keyof 行政区层级统计
+export type RegionSourceLevel = 行政区来源层级
+
+export type 数据来源层级明细 = {
+  层级: 行政区来源层级
+  来源名称: string
+  来源URL: string
+  来源类型: 数据来源类型
+  许可证?: string
+  版本或Commit?: string
+  数据截止日期: string
+  记录数量: number
+  备注?: string
+}
+export type DataSourceLevelDetail = 数据来源层级明细
+export type 数据来源层级明细表 = Readonly<Partial<Record<行政区来源层级, 数据来源层级明细>>>
+export type DataSourceLevelDetails = 数据来源层级明细表
 
 export type 数据来源信息 = {
   来源名称: string
@@ -27,6 +44,7 @@ export type 数据来源信息 = {
   生成脚本版本: string
   校验依据: readonly string[]
   记录数量: 行政区层级统计
+  层级来源: 数据来源层级明细表
 }
 export type DataSourceInfo = 数据来源信息
 
@@ -58,6 +76,63 @@ export const 生成数据来源: 数据来源信息 = {
     "县级": 2975,
     "乡级": 41352,
     "港澳台": 411
+  },
+  "层级来源": {
+    "省级": {
+      "层级": "省级",
+      "来源名称": "china-division",
+      "来源URL": "https://github.com/modood/Administrative-divisions-of-China",
+      "来源类型": "第三方种子",
+      "许可证": "package.json: MIT; included LICENSE: WTFPL-2.0",
+      "版本或Commit": "npm:china-division@2.7.0",
+      "数据截止日期": "2023-06-30",
+      "记录数量": 31,
+      "备注": "大陆省级行政区划"
+    },
+    "地级": {
+      "层级": "地级",
+      "来源名称": "china-division",
+      "来源URL": "https://github.com/modood/Administrative-divisions-of-China",
+      "来源类型": "第三方种子",
+      "许可证": "package.json: MIT; included LICENSE: WTFPL-2.0",
+      "版本或Commit": "npm:china-division@2.7.0",
+      "数据截止日期": "2023-06-30",
+      "记录数量": 342,
+      "备注": "大陆地级行政区划"
+    },
+    "县级": {
+      "层级": "县级",
+      "来源名称": "china-division",
+      "来源URL": "https://github.com/modood/Administrative-divisions-of-China",
+      "来源类型": "第三方种子",
+      "许可证": "package.json: MIT; included LICENSE: WTFPL-2.0",
+      "版本或Commit": "npm:china-division@2.7.0",
+      "数据截止日期": "2023-06-30",
+      "记录数量": 2975,
+      "备注": "大陆县级行政区划"
+    },
+    "乡级": {
+      "层级": "乡级",
+      "来源名称": "china-division",
+      "来源URL": "https://github.com/modood/Administrative-divisions-of-China",
+      "来源类型": "第三方种子",
+      "许可证": "package.json: MIT; included LICENSE: WTFPL-2.0",
+      "版本或Commit": "npm:china-division@2.7.0",
+      "数据截止日期": "2023-06-30",
+      "记录数量": 41352,
+      "备注": "大陆乡镇街道级行政区划"
+    },
+    "港澳台": {
+      "层级": "港澳台",
+      "来源名称": "china-division",
+      "来源URL": "https://github.com/modood/Administrative-divisions-of-China",
+      "来源类型": "第三方种子",
+      "许可证": "package.json: MIT; included LICENSE: WTFPL-2.0",
+      "版本或Commit": "npm:china-division@2.7.0",
+      "数据截止日期": "2023-06-30",
+      "记录数量": 411,
+      "备注": "港澳台可变深度行政区划"
+    }
   }
 }
 export const generatedDataSource = 生成数据来源
