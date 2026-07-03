@@ -336,3 +336,36 @@ Split city and region generated data into lightweight city exports, full compati
 ### Next Steps
 
 - None - task complete
+
+
+## Session 11: Source refresh decision and source manifest attribution
+
+**Date**: 2026-07-04
+**Task**: Source refresh decision and source manifest attribution
+**Branch**: `codex/cityselect-mvp`
+
+### Summary
+
+Completed source refresh research, deferred replacing china-division until official or newer sources can preserve mainland four-level and HMT coverage, added per-level/per-shard source attribution to generated data manifests, updated docs/specs, and passed release:check.
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `0750418` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
