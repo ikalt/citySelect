@@ -1,0 +1,2 @@
+{"file": ".trellis/spec/backend/database-guidelines.md", "reason": "Check source replacement decisions against coverage, cutoff, license, manifest, and validation requirements."}
+{"file": ".trellis/spec/backend/quality-guidelines.md", "reason": "Check source changes with generate:data, validate:data, tests, and full quality gate when code changes land."}

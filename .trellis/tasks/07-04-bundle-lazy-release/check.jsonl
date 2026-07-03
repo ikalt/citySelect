@@ -1,0 +1,4 @@
+{"file": ".trellis/spec/backend/database-guidelines.md", "reason": "Verified generated city data, full compatibility data, manifest, shards, validation, size, and release dry-run contract."}
+{"file": ".trellis/spec/backend/quality-guidelines.md", "reason": "Verified lint, typecheck, format, tests, validate:data, demo:taro, and release:check with pnpm fallback."}
+{"file": ".trellis/spec/frontend/quality-guidelines.md", "reason": "Verified deterministic demo snapshot includes lazy-loaded region path without real remote services."}
+{"file": ".trellis/spec/guides/code-reuse-thinking-guide.md", "reason": "Verified shard selection and hierarchy logic are centralized in packages/data instead of duplicated in consumers."}

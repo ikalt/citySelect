@@ -4,7 +4,7 @@ CitySelect 使用 Core-first 分层：
 
 ```text
 packages/core      -> 类型、搜索、分组、最近访问、行政区结果
-packages/data      -> 源快照、生成脚本、全国行政区数据、查询 helper 和校验
+packages/data      -> 源快照、生成脚本、城市轻量数据、行政区分片、查询 helper 和校验
 packages/providers -> 本地 / mock / 组合 provider 和降级状态
 packages/taro      -> Taro-facing props / state / event 适配层
 apps/demo-taro     -> 可运行 demo 快照
@@ -13,7 +13,7 @@ apps/demo-taro     -> 可运行 demo 快照
 核心原则：
 
 - `core` 不依赖 UI、数据包、provider 或远程服务。
-- `data` 负责源快照、生成产物、来源元数据、查询 helper 和校验。
+- `data` 负责源快照、生成产物、来源元数据、轻量城市入口、lazy 行政区入口、兼容同步入口和校验。
 - `providers` 负责异步搜索、组合和降级状态。
 - `taro` 负责中文 / 英文 API 归一化和 UI-facing 状态，不实现搜索排名或 provider 合并。
 - demo 使用确定性本地数据和 mock provider，基础测试不依赖网络。
@@ -21,11 +21,15 @@ apps/demo-taro     -> 可运行 demo 快照
 ## 数据流
 
 ```text
-source snapshot -> generate:data -> generated regions.ts -> data public API
-      -> core selection/search helpers -> providers / taro / demo
+source snapshot -> generate:data
+      -> generated cities.ts -> data /cities -> providers / taro city search
+      -> generated region manifest + shards -> data /regions -> lazy region flows
+      -> generated regions-full.ts -> data root heavy compatibility
 ```
 
 `packages/core` 只定义通用类型和框架无关行为。`packages/data` 从源快照生成 `城市` 记录，补齐拼音、首字母、父级编码、路径编码、路径名称、地区口径和来源元数据。`packages/taro` 通过 `编码路径` 组装选择状态，不重新实现层级规则。
+
+`@ikalt/city-select-data/cities` 是轻量入口；`@ikalt/city-select-data/regions` 是 lazy 行政区入口；根入口保留同步完整数据作为 heavy compatibility。参考项目中“提前加载本地数据避免弹出卡顿”的经验在当前架构中转化为 `预加载行政区分片`，由数据层统一负责动态 import 和模块缓存。
 
 ## 数据模型
 

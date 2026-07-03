@@ -1,0 +1,3 @@
+{"file": ".trellis/tasks/07-03-data-source-bundle-release/prd.md", "reason": "Parent records official-source findings and the dependency on lazy/source manifest work."}
+{"file": ".trellis/spec/backend/database-guidelines.md", "reason": "Source refresh must preserve generated data attribution, validation, source manifest, and lazy shard contracts."}
+{"file": ".trellis/spec/guides/cross-layer-thinking-guide.md", "reason": "Source replacement can affect generator inputs, runtime APIs, docs, validation, and demo snapshots."}

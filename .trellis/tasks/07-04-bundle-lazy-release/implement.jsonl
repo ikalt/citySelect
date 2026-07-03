@@ -1,0 +1,4 @@
+{"file": ".trellis/spec/backend/database-guidelines.md", "reason": "Data artifact ownership, validation, lazy shard manifest, and release-size contracts for packages/data."}
+{"file": ".trellis/spec/backend/quality-guidelines.md", "reason": "Pinned pnpm fallback and required lint/typecheck/test/validation gates."}
+{"file": ".trellis/spec/frontend/component-guidelines.md", "reason": "Taro adapter must not duplicate data hierarchy or fork Chinese/English behavior paths."}
+{"file": ".trellis/spec/guides/cross-layer-thinking-guide.md", "reason": "Change crosses data, providers, Taro, demo, docs, and release scripts."}

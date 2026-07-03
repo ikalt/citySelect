@@ -7,8 +7,11 @@
     "typecheck": "tsc -b",
     "test": "vitest run",
     "generate:data": "node packages/data/scripts/generate-data.mjs",
+    "size:data": "node packages/data/scripts/report-size.mjs",
     "validate:data": "tsc -b && node packages/data/dist/validate-data.js",
     "demo:taro": "tsc -b && TMPDIR=/tmp tsx apps/demo-taro/src/run-demo.ts",
+    "pack:dry-run": "tsc -b && node packages/data/scripts/pack-dry-run.mjs",
+    "release:check": "eslint . && tsc -b && prettier --check . && vitest run && node packages/data/dist/validate-data.js && TMPDIR=/tmp tsx apps/demo-taro/src/run-demo.ts && node packages/data/scripts/report-size.mjs && node packages/data/scripts/pack-dry-run.mjs",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
   },

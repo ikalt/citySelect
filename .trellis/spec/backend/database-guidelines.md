@@ -37,6 +37,10 @@ Generate these artifacts from source data:
   city markers.
 - region data: mainland province/city/county/township hierarchy, plus
   Hong Kong / Macau / Taiwan variable-depth paths.
+- region manifest: shard key, root codes, counts, level stats, source summary,
+  checksum, code-to-shard index, and root region list.
+- region shards: mainland records split by province root code, plus a Hong Kong
+  / Macau / Taiwan shard.
 - search index: name, pinyin, initials, and aliases.
 - A-Z group index.
 - data version metadata such as `2026.06-cn-region`.
@@ -135,10 +139,27 @@ const 内置城市列表: readonly 城市[]
 const 内置行政区列表: readonly 城市[]
 const 热门城市编码: readonly string[]
 
+type 行政区分片信息 = {
+  分片键: string
+  名称: string
+  根编码列表: readonly string[]
+  记录数: number
+  层级统计: 行政区层级统计
+  地区口径?: 地区口径
+  checksum: string
+}
+
 function 按编码查找行政区(编码: string): 城市 | undefined
 function 按父级编码查找行政区(父级编码?: string): 城市[]
 function 按级别查找行政区(级别: 行政级别): 城市[]
 function 获取行政区路径(编码: string): 城市[]
+function 获取行政区分片列表(): readonly 行政区分片信息[]
+function 获取行政区分片键列表(): readonly string[]
+function 加载行政区分片(分片键: string): Promise<readonly 城市[]>
+function 预加载行政区分片(分片键: string): Promise<void>
+function 按编码加载行政区(编码: string): Promise<城市 | undefined>
+function 按编码加载行政区路径(编码: string): Promise<readonly 城市[]>
+function 按父级编码加载行政区子级(父级编码?: string): Promise<readonly 城市[]>
 function 校验城市数据(输入: 城市数据校验输入): 数据校验问题[]
 function 校验内置数据(): 数据校验问题[]
 ```
@@ -155,6 +176,13 @@ const findRegionByCode: typeof 按编码查找行政区
 const findRegionsByParentCode: typeof 按父级编码查找行政区
 const findRegionsByLevel: typeof 按级别查找行政区
 const getRegionPath: typeof 获取行政区路径
+const listRegionShards: typeof 获取行政区分片列表
+const listRegionShardKeys: typeof 获取行政区分片键列表
+const loadRegionShard: typeof 加载行政区分片
+const prefetchRegionShard: typeof 预加载行政区分片
+const loadRegionByCode: typeof 按编码加载行政区
+const loadRegionPathByCode: typeof 按编码加载行政区路径
+const loadRegionsByParentCode: typeof 按父级编码加载行政区子级
 const validateCityData: typeof 校验城市数据
 const validateBuiltInData: typeof 校验内置数据
 ```
@@ -163,6 +191,9 @@ Root command:
 
 ```bash
 npm exec --yes --package pnpm@9.15.4 -- pnpm validate:data
+npm exec --yes --package pnpm@9.15.4 -- pnpm size:data
+npm exec --yes --package pnpm@9.15.4 -- pnpm pack:dry-run
+npm exec --yes --package pnpm@9.15.4 -- pnpm release:check
 ```
 
 ### 3. Contracts
@@ -171,6 +202,24 @@ npm exec --yes --package pnpm@9.15.4 -- pnpm validate:data
 - `packages/core` must not depend on `packages/data`.
 - Full data must be generated from committed source snapshots and a deterministic
   script, not hand-maintained as large arrays in `packages/data/src/index.ts`.
+- `@ikalt/city-select-data/cities` is the lightweight city/provider entry and
+  must not import full region compatibility data.
+- `@ikalt/city-select-data/regions` owns lazy region shard access. UI adapters
+  and providers must not duplicate shard selection or hierarchy rules.
+- Root `@ikalt/city-select-data` may keep `内置行政区列表` and sync region helpers
+  for compatibility, but those exports are heavy compatibility because they
+  parse the full generated region payload.
+- Lazy region loaders return empty arrays for unknown shard/code inputs instead
+  of throwing during ordinary lookup.
+- `预加载行政区分片` is a semantic prefetch wrapper around the same loader used by
+  lazy queries, so preloading and querying cannot diverge.
+- `size:data` must report source/generated size, full compatibility size,
+  manifest size, shard count, shard total, and largest shard.
+- `pack:dry-run` creates a temporary dist-only package staging directory from
+  `packages/data/dist` and runs npm dry-run there; it must not publish npm
+  packages.
+- `release:check` is a publishing readiness gate only; it must not publish npm
+  packages.
 - Validation returns structured issues and does not throw for ordinary bad
   records.
 - `validate:data` compiles TypeScript first, then runs the emitted Node CLI from

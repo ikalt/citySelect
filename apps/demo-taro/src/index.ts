@@ -4,6 +4,7 @@ import {
   创建组合Provider,
 } from "@ikalt/city-select-providers"
 import { 按编码查找行政区, 按父级编码查找行政区 } from "@ikalt/city-select-data"
+import { 按编码加载行政区路径 } from "@ikalt/city-select-data/regions"
 import {
   创建城市选择器状态,
   创建省市区选择器状态,
@@ -25,6 +26,10 @@ export type Demo快照 = {
     名称路径: string[]
   }
   四级选择: {
+    编码路径: string[]
+    名称路径: string[]
+  }
+  懒加载四级选择: {
     编码路径: string[]
     名称路径: string[]
   }
@@ -59,6 +64,7 @@ export async function 创建Demo快照(): Promise<Demo快照> {
   const 四级状态 = 创建省市区选择器状态({
     编码路径: ["330000", "330100", "330106", "330106002"],
   })
+  const 懒加载四级路径 = await 按编码加载行政区路径("330106002")
   const 台湾 = 按编码查找行政区("710000")
   const 台北 = 台湾
     ? 按父级编码查找行政区(台湾.编码).find((记录) => 记录.名称 === "台北市")
@@ -104,6 +110,10 @@ export async function 创建Demo快照(): Promise<Demo快照> {
     四级选择: {
       编码路径: 四级状态.选择结果?.编码路径 ?? [],
       名称路径: 四级状态.选择结果?.名称路径 ?? [],
+    },
+    懒加载四级选择: {
+      编码路径: 懒加载四级路径.map((记录) => 记录.编码),
+      名称路径: 懒加载四级路径.map((记录) => 记录.名称),
     },
     港澳台选择: {
       编码路径: 港澳台状态.选择结果?.编码路径 ?? [],

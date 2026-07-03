@@ -1,12 +1,7 @@
 import type { 城市, 地区口径, 行政级别 } from "@ikalt/city-select-core"
 
-import {
-  生成城市列表,
-  生成数据来源,
-  生成数据版本,
-  生成热门城市编码,
-  生成行政区列表,
-} from "./generated/regions.js"
+import { 内置城市列表, 热门城市编码 } from "./cities.js"
+import { 生成行政区列表 } from "./generated/regions-full.js"
 
 export type {
   DataSourceInfo,
@@ -15,15 +10,42 @@ export type {
   数据来源信息,
   数据来源类型,
   行政区层级统计,
-} from "./generated/regions.js"
+} from "./generated/cities.js"
+export type { DataVersion, 数据版本信息 } from "./cities.js"
+export {
+  builtInCities,
+  dataSource,
+  dataVersion,
+  hotCityCodes,
+  内置城市列表,
+  数据来源,
+  数据版本,
+  热门城市编码,
+} from "./cities.js"
+export {
+  listRegionShardKeys,
+  listRegionShards,
+  loadRegionByCode,
+  loadRegionPathByCode,
+  loadRegionShard,
+  loadRegionsByParentCode,
+  prefetchRegionShard,
+  按父级编码加载行政区子级,
+  按编码加载行政区,
+  按编码加载行政区路径,
+  加载行政区分片,
+  获取行政区分片列表,
+  获取行政区分片键列表,
+  预加载行政区分片,
+} from "./regions.js"
+export type {
+  RegionShardInfo,
+  RegionShardKey,
+  行政区分片信息,
+  行政区分片键,
+} from "./regions.js"
 
 export const citySelectDataPackage = "@ikalt/city-select-data" as const
-
-export type 数据版本信息 = {
-  编码: string
-  名称: string
-}
-export type DataVersion = 数据版本信息
 
 export type 数据校验问题代码 =
   | "重复编码"
@@ -53,18 +75,6 @@ export type 城市数据校验输入 = {
   热门城市编码: readonly string[]
 }
 export type CityDataValidationInput = 城市数据校验输入
-
-export const 数据版本: 数据版本信息 = 生成数据版本
-export const dataVersion = 数据版本
-
-export const 数据来源 = 生成数据来源
-export const dataSource = 数据来源
-
-export const 内置城市列表: readonly 城市[] = 生成城市列表
-export const builtInCities = 内置城市列表
-
-export const 热门城市编码 = 生成热门城市编码
-export const hotCityCodes = 热门城市编码
 
 export const 内置行政区列表: readonly 城市[] = 生成行政区列表
 export const builtInRegions = 内置行政区列表

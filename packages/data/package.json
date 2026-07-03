@@ -3,8 +3,29 @@
   "version": "0.0.0",
   "type": "module",
   "private": true,
+  "license": "UNLICENSED",
+  "sideEffects": false,
+  "files": [
+    "dist",
+    "src",
+    "package.json",
+    "!dist/**/*.map",
+    "!dist/**/*.test.*",
+    "!src/**/*.test.ts"
+  ],
   "exports": {
-    ".": "./src/index.ts"
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./cities": {
+      "types": "./src/cities.ts",
+      "default": "./src/cities.ts"
+    },
+    "./regions": {
+      "types": "./src/regions.ts",
+      "default": "./src/regions.ts"
+    }
   },
   "dependencies": {
     "@ikalt/city-select-core": "workspace:*"

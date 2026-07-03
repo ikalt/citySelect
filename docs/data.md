@@ -1,6 +1,6 @@
 # 数据与校验
 
-`packages/data` 提供 CitySelect 的全国行政区划数据、热门城市入口、查询 helper、来源元数据和校验命令。完整数据不是手写在 `src/index.ts` 中，而是由源快照和生成脚本复现。
+`packages/data` 提供 CitySelect 的全国行政区划数据、热门城市入口、查询 helper、来源元数据、懒加载分片和校验命令。完整数据不是手写在 `src/index.ts` 中，而是由源快照和生成脚本复现。
 
 ## 数据版本
 
@@ -29,7 +29,8 @@
 - 第一版不包含村 / 社区 / 居委会第五级。
 - 港澳台包含在全国库中，使用 `地区口径` 标注为 `香港澳门特别行政区` 或 `台湾地区`。
 - 港澳台不强行补齐大陆四级，消费者应优先使用 `路径编码` / `路径名称` 展示完整路径。
-- `内置城市列表` 是轻量城市搜索入口，不等同于完整行政区列表；完整层级请使用 `内置行政区列表` 或查询 helper。
+- `内置城市列表` 是轻量城市搜索入口，不等同于完整行政区列表；完整层级优先使用 lazy API。
+- `内置行政区列表` 和同步 region helper 保留为兼容入口，会解析完整全国行政区数据，属于 heavy compatibility。
 
 ## 数据来源
 
@@ -61,11 +62,38 @@ npm exec --yes --package pnpm@9.15.4 -- pnpm generate:data
 
 输出：
 
-- `packages/data/src/generated/regions.ts`
+- `packages/data/src/generated/cities.ts`：轻量城市、热门城市、数据版本和来源元数据。
+- `packages/data/src/generated/regions-full.ts`：完整行政区兼容产物。
+- `packages/data/src/generated/regions.ts`：旧生成入口兼容转发。
+- `packages/data/src/generated/region-manifest.ts`：分片 manifest、编码到分片索引、根节点列表。
+- `packages/data/src/generated/region-shards.ts`：动态 import 分片 loader。
+- `packages/data/src/generated/regions/*.ts`：大陆按省级编码切分，港澳台合并到 `hmt.ts`。
 
 生成文件是 committed artifact，但被 ESLint 和 Prettier 忽略。修改数据范围时应修生成脚本并重新生成，不手工 patch 大型产物。
 
 ## 导出
+
+轻量城市入口：
+
+```ts
+import { 内置城市列表, 热门城市编码, 数据来源 } from "@ikalt/city-select-data/cities"
+```
+
+Lazy 行政区入口：
+
+```ts
+import {
+  获取行政区分片列表,
+  加载行政区分片,
+  预加载行政区分片,
+  按编码加载行政区路径,
+  按父级编码加载行政区子级,
+} from "@ikalt/city-select-data/regions"
+```
+
+参考项目里“提前加载本地城市数据，避免首次弹出卡顿”的经验在这里落实为分片预取：进入行政区选择页前可调用 `预加载行政区分片("330000")`，实际查询仍复用同一个分片 loader。
+
+兼容同步入口：
 
 - `数据版本` / `dataVersion`
 - `数据来源` / `dataSource`
@@ -79,6 +107,8 @@ npm exec --yes --package pnpm@9.15.4 -- pnpm generate:data
 - `是港澳台口径` / `isHongKongMacauTaiwanScope`
 - `校验城市数据` / `validateCityData`
 - `校验内置数据` / `validateBuiltInData`
+
+`@ikalt/city-select-data` 根入口为了兼容旧调用仍导出同步完整数据，但生产端城市搜索、热门城市、本地 provider 应优先使用 `/cities`，行政区选择应优先使用 `/regions`。
 
 ## 校验命令
 
@@ -101,6 +131,16 @@ npm exec --yes --package pnpm@9.15.4 -- pnpm validate:data
 - 拼音和首字母存在。
 - 热门城市编码能匹配正式城市记录。
 - 港澳台跳过大陆数字编码形态校验，但仍要求父级链和路径完整。
+
+## 体积与发布检查
+
+```bash
+npm exec --yes --package pnpm@9.15.4 -- pnpm size:data
+npm exec --yes --package pnpm@9.15.4 -- pnpm pack:dry-run
+npm exec --yes --package pnpm@9.15.4 -- pnpm release:check
+```
+
+`size:data` 输出源产物和已构建 dist 产物的城市文件、manifest、完整兼容文件、分片数量、分片总量和最大分片。`pack:dry-run` 会从 `packages/data/dist` 生成临时 dist-only 包目录并检查包内容，不发布 npm。`release:check` 串行执行 lint、typecheck、format check、test、data validation、demo snapshot、size report 和 pack dry-run。
 
 ## 已知限制
 

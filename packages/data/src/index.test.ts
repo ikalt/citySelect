@@ -1,7 +1,14 @@
+import { readFileSync } from "node:fs"
+
 import { describe, expect, it } from "vitest"
 
 import type { 城市 } from "@ikalt/city-select-core"
 
+import {
+  内置城市列表 as 轻量内置城市列表,
+  数据来源 as 轻量数据来源,
+  热门城市编码 as 轻量热门城市编码,
+} from "./cities"
 import {
   内置城市列表,
   内置行政区列表,
@@ -15,6 +22,15 @@ import {
   热门城市编码,
   获取行政区路径,
 } from "./index"
+import {
+  按父级编码加载行政区子级,
+  按编码加载行政区,
+  按编码加载行政区路径,
+  加载行政区分片,
+  获取行政区分片列表,
+  获取行政区分片键列表,
+  预加载行政区分片,
+} from "./regions"
 
 describe("@ikalt/city-select-data", () => {
   it("exports versioned national city and region records compatible with core", () => {
@@ -66,6 +82,70 @@ describe("@ikalt/city-select-data", () => {
     ])
   })
 
+  it("keeps the city entry lightweight and independent from full region data", () => {
+    const citiesSource = readFileSync(new URL("./cities.ts", import.meta.url), "utf8")
+    const providersSource = readFileSync(
+      new URL("../../providers/src/index.ts", import.meta.url),
+      "utf8",
+    )
+
+    expect(轻量内置城市列表).toBe(内置城市列表)
+    expect(轻量数据来源.记录数量.乡级).toBeGreaterThan(41_000)
+    expect(轻量热门城市编码).toEqual(热门城市编码)
+    expect(citiesSource).not.toContain("regions-full")
+    expect(citiesSource).not.toContain("生成行政区列表")
+    expect(providersSource).toContain("@ikalt/city-select-data/cities")
+  })
+
+  it("exposes deterministic region shard manifest and lazy loaders", async () => {
+    const 分片列表 = 获取行政区分片列表()
+    const 浙江分片信息 = 分片列表.find((分片) => 分片.分片键 === "330000")
+    const 港澳台分片信息 = 分片列表.find((分片) => 分片.分片键 === "hmt")
+    const 分片键列表 = 获取行政区分片键列表()
+    const 浙江分片 = await 加载行政区分片("330000")
+    const 缺失分片 = await 加载行政区分片("missing")
+    await 预加载行政区分片("330000")
+
+    expect(分片列表).toHaveLength(32)
+    expect(分片键列表).toContain("330000")
+    expect(分片键列表).toContain("hmt")
+    expect(浙江分片信息).toMatchObject({
+      分片键: "330000",
+      名称: "浙江省",
+      根编码列表: ["330000"],
+      地区口径: "大陆行政区划",
+    })
+    expect(浙江分片信息?.记录数).toBeGreaterThan(1_000)
+    expect(浙江分片信息?.checksum).toMatch(/^[0-9a-f]{16}$/)
+    expect(港澳台分片信息).toMatchObject({
+      分片键: "hmt",
+      名称: "港澳台",
+      根编码列表: ["710000", "810000", "820000"],
+    })
+    expect(浙江分片.some((记录) => 记录.编码 === "330106002")).toBe(true)
+    expect(缺失分片).toEqual([])
+  })
+
+  it("loads mainland region paths and children lazily", async () => {
+    const 北山街道 = await 按编码加载行政区("330106002")
+    const 西湖子级 = await 按父级编码加载行政区子级("330106")
+    const 根列表 = await 按父级编码加载行政区子级()
+    const 北山路径 = await 按编码加载行政区路径("330106002")
+
+    expect(北山街道).toMatchObject({ 名称: "北山街道", 父级编码: "330106" })
+    expect(西湖子级.some((记录) => 记录.名称 === "北山街道")).toBe(true)
+    expect(根列表.map((记录) => 记录.编码)).toEqual(
+      expect.arrayContaining(["330000", "710000", "810000", "820000"]),
+    )
+    expect(北山路径.map((记录) => 记录.名称)).toEqual([
+      "浙江省",
+      "杭州市",
+      "西湖区",
+      "北山街道",
+    ])
+    expect(北山路径).toEqual(获取行政区路径("330106002"))
+  })
+
   it("includes Hong Kong, Macau, and Taiwan with variable-depth paths", () => {
     const 台湾 = 按编码查找行政区("710000")
     const 台北 = 按父级编码查找行政区("710000").find((记录) => 记录.名称 === "台北市")
@@ -94,6 +174,22 @@ describe("@ikalt/city-select-data", () => {
     expect(香港路径子级.map((记录) => 记录.名称).sort()).toEqual(
       ["九龙", "新界", "香港岛"].sort(),
     )
+  })
+
+  it("loads Hong Kong, Macau, and Taiwan variable-depth paths lazily", async () => {
+    const 台湾子级 = await 按父级编码加载行政区子级("710000")
+    const 台北 = 台湾子级.find((记录) => 记录.名称 === "台北市")
+    const 台北子级 = 台北 ? await 按父级编码加载行政区子级(台北.编码) : []
+    const 大安 = 台北子级.find((记录) => 记录.名称 === "大安区")
+    const 大安路径 = 大安 ? await 按编码加载行政区路径(大安.编码) : []
+    const 未知路径 = await 按编码加载行政区路径("unknown")
+    const 未知子级 = await 按父级编码加载行政区子级("unknown")
+
+    expect(台北).toMatchObject({ 级别: "市", 地区口径: "台湾地区" })
+    expect(大安).toMatchObject({ 级别: "区县", 地区口径: "台湾地区" })
+    expect(大安路径.map((记录) => 记录.名称)).toEqual(["台湾省", "台北市", "大安区"])
+    expect(未知路径).toEqual([])
+    expect(未知子级).toEqual([])
   })
 
   it("passes validation for the bundled national dataset", () => {

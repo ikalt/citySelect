@@ -1,0 +1,2 @@
+{"file": ".trellis/spec/backend/database-guidelines.md", "reason": "Parent acceptance requires source manifest, lazy shard contract, size report, and validation coverage."}
+{"file": ".trellis/spec/backend/quality-guidelines.md", "reason": "Parent quality gates must include lint, typecheck, format, tests, validate:data, demo:taro, and release checks."}

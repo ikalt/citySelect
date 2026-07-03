@@ -5,7 +5,7 @@ import {
   type Destination,
   type 目的地,
 } from "@ikalt/city-select-core"
-import { 内置城市列表, 热门城市编码 } from "@ikalt/city-select-data"
+import { 内置城市列表, 热门城市编码 } from "@ikalt/city-select-data/cities"
 
 export const citySelectProvidersPackage = "@ikalt/city-select-providers" as const
 

@@ -17,6 +17,7 @@ CitySelect 是一个中文优先的跨端城市 / 目的地选择 MVP。当前�
 ```bash
 npm exec --yes --package pnpm@9.15.4 -- pnpm install
 npm exec --yes --package pnpm@9.15.4 -- pnpm generate:data
+npm exec --yes --package pnpm@9.15.4 -- pnpm size:data
 npm exec --yes --package pnpm@9.15.4 -- pnpm test
 npm exec --yes --package pnpm@9.15.4 -- pnpm validate:data
 npm exec --yes --package pnpm@9.15.4 -- pnpm demo:taro
@@ -33,6 +34,19 @@ npm exec --yes --package pnpm@9.15.4 -- pnpm demo:taro
 - 第一版不包含村 / 社区 / 居委会第五级。
 
 数据种子来自 `china-division@2.7.0`，作为第三方整理库使用。源快照记录在 `packages/data/source/china-division-2.7.0/`，生成产物记录来源 URL、许可证说明、数据截止日期 `2023-06-30` 和生成摘要。
+
+## 数据入口
+
+- `@ikalt/city-select-data/cities`：轻量城市入口，适合城市搜索、热门城市和本地 provider，不解析完整行政区数据。
+- `@ikalt/city-select-data/regions`：行政区 lazy 入口，可列出分片、加载省级分片、按编码/父级编码异步取路径或子级，并可预加载用户即将打开的省份。
+- `@ikalt/city-select-data`：兼容入口，保留 `内置行政区列表` 和同步查询 helper；这些 API 会解析完整全国行政区数据，属于 heavy compatibility。
+
+发布前检查骨架，`pack:dry-run` 会从已构建的 `packages/data/dist` 生成临时 dist-only 包目录并执行 npm dry-run：
+
+```bash
+npm exec --yes --package pnpm@9.15.4 -- pnpm pack:dry-run
+npm exec --yes --package pnpm@9.15.4 -- pnpm release:check
+```
 
 ## 文档
 

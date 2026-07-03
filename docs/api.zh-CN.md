@@ -2,6 +2,12 @@
 
 ## 城市选择
 
+轻量城市数据可直接从 `/cities` 子入口导入，适合 provider、搜索框和热门城市，不会解析完整行政区产物：
+
+```ts
+import { 内置城市列表, 热门城市编码 } from "@ikalt/city-select-data/cities"
+```
+
 ```ts
 import { 创建城市选择器状态, 触发城市选择 } from "@ikalt/city-select-taro"
 
@@ -86,6 +92,40 @@ const 台湾状态 = 创建省市区选择器状态({
 港澳台子级编码由生成脚本稳定生成。业务代码应通过 `packages/data` 查询 helper 查找，不要硬编码派生编码。
 
 ## 行政区数据查询
+
+推荐使用 lazy 行政区入口：
+
+```ts
+import {
+  获取行政区分片列表,
+  预加载行政区分片,
+  按编码加载行政区路径,
+  按父级编码加载行政区子级,
+} from "@ikalt/city-select-data/regions"
+
+const 分片列表 = 获取行政区分片列表()
+await 预加载行政区分片("330000")
+
+const 北山路径 = await 按编码加载行政区路径("330106002")
+const 西湖子级 = await 按父级编码加载行政区子级("330106")
+
+console.log(分片列表.length)
+console.log(北山路径.map((记录) => 记录.名称).join("/"))
+console.log(西湖子级.map((记录) => 记录.名称))
+```
+
+港澳台也走同一 lazy API：
+
+```ts
+const 台湾子级 = await 按父级编码加载行政区子级("710000")
+const 台北 = 台湾子级.find((记录) => 记录.名称 === "台北市")
+const 大安 = 台北
+  ? (await 按父级编码加载行政区子级(台北.编码)).find((记录) => 记录.名称 === "大安区")
+  : undefined
+const 大安路径 = 大安 ? await 按编码加载行政区路径(大安.编码) : []
+```
+
+同步完整入口保留为 heavy compatibility，会解析完整全国行政区数据：
 
 ```ts
 import {

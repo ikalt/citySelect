@@ -1,0 +1,3 @@
+{"file": ".trellis/spec/backend/database-guidelines.md", "reason": "Parent roadmap covers source manifest, generated artifacts, lazy data contracts, validation, and release checks."}
+{"file": ".trellis/spec/backend/quality-guidelines.md", "reason": "Parent verification uses pinned pnpm fallback and full workspace quality gates."}
+{"file": ".trellis/spec/guides/cross-layer-thinking-guide.md", "reason": "Parent work spans data generation, public APIs, providers, UI adapter, docs, release flow, and PR workflow."}

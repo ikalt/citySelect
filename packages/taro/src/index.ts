@@ -6,7 +6,8 @@ import {
   type 行政区选择结果,
   type 目的地,
 } from "@ikalt/city-select-core"
-import { 内置城市列表, 内置行政区列表, 热门城市编码 } from "@ikalt/city-select-data"
+import { 内置城市列表, 热门城市编码 } from "@ikalt/city-select-data/cities"
+import { 内置行政区列表 } from "@ikalt/city-select-data"
 import type { ProviderSearchResponse, Provider状态 } from "@ikalt/city-select-providers"
 
 export const citySelectTaroPackage = "@ikalt/city-select-taro" as const
