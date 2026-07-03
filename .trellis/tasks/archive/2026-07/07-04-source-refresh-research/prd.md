@@ -37,11 +37,11 @@
 
 ## Acceptance Criteria
 
-- [ ] 有 source decision note，比较官方源、省级乡级源、第三方候选源。
-- [ ] 明确是否替换当前源；若不替换，记录 defer 原因。
-- [ ] 若替换或混合，生成数据保持大陆四级和港澳台可变深度覆盖。
-- [ ] source manifest 可表达每个层级/分片的数据来源和 cutoff。
-- [ ] `generate:data`、`validate:data`、测试和 demo 通过。
+- [x] 有 source decision note，比较官方源、省级乡级源、第三方候选源。
+- [x] 明确是否替换当前源；若不替换，记录 defer 原因。
+- [x] 若替换或混合，生成数据保持大陆四级和港澳台可变深度覆盖。
+- [x] source manifest 可表达每个层级/分片的数据来源和 cutoff。
+- [x] `generate:data`、`validate:data`、测试和 demo 通过。
 
 ## Out Of Scope
 
